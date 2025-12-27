@@ -9,9 +9,22 @@ public class PageManager {
     private MainPage mainPage;
     private LoginPage loginPage;
     private WebFormPage webFormPage;
+    private DownloadPage downloadPage;
 
     public PageManager(WebDriver driver) {
         this.driver = driver;
+    }
+
+    public DownloadPage getDownloadPage() {
+        if (downloadPage == null) {
+            downloadPage = new DownloadPage(driver);
+        }
+        return downloadPage;
+    }
+
+    public void openDownloadPage(String url) {
+        driver.get(url);
+        getDownloadPage();
     }
 
     public MainPage getMainPage() {
