@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,17 +21,29 @@ public class DriverFactory {
     }
 
     public static WebDriver createDriver(BrowserType browserType) {
+        return createDriver(browserType, null);
+    }
+
+    public static WebDriver createDriver(BrowserType browserType, Object options) {
         WebDriver driver;
 
         switch (browserType) {
             case FIREFOX:
                 WebDriverManager.firefoxdriver().setup();
-                driver = new FirefoxDriver();
+                if (options instanceof FirefoxOptions) {
+                    driver = new FirefoxDriver((FirefoxOptions) options);
+                } else {
+                    driver = new FirefoxDriver();
+                }
                 break;
             case CHROME:
             default:
                 WebDriverManager.chromedriver().setup();
-                driver = new ChromeDriver();
+                if (options instanceof ChromeOptions) {
+                    driver = new ChromeDriver((ChromeOptions) options);
+                } else {
+                    driver = new ChromeDriver();
+                }
                 break;
         }
 
