@@ -18,7 +18,7 @@ import static org.hamcrest.Matchers.*;
 @Tag("API")
 @Tag("User")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class UserApiTests extends ApiTestBase {
+public class UserPostTest extends ApiTestBase {
 
     private UserApi userApi;
     private List<User> testUsers;
