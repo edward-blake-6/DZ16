@@ -44,10 +44,66 @@ public class User {
         this.userStatus = userStatus;
     }
 
-    public static UserBuilder builder() {
-        return new UserBuilder();
+    public static Builder builder() {
+        return new Builder();
     }
 
+    public static class Builder {
+        private Integer id;
+        private String username;
+        private String firstName;
+        private String lastName;
+        private String email;
+        private String password;
+        private String phone;
+        private Integer userStatus;
+
+        public Builder id(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder username(String username) {
+            this.username = username;
+            return this;
+        }
+
+        public Builder firstName(String firstName) {
+            this.firstName = firstName;
+            return this;
+        }
+
+        public Builder lastName(String lastName) {
+            this.lastName = lastName;
+            return this;
+        }
+
+        public Builder email(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public Builder password(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public Builder phone(String phone) {
+            this.phone = phone;
+            return this;
+        }
+
+        public Builder userStatus(Integer userStatus) {
+            this.userStatus = userStatus;
+            return this;
+        }
+
+        public User build() {
+            return new User(id, username, firstName, lastName, email, password, phone, userStatus);
+        }
+    }
+
+    // Геттеры и сеттеры
     public Integer getId() {
         return id;
     }
@@ -112,58 +168,17 @@ public class User {
         this.userStatus = userStatus;
     }
 
-    public static class UserBuilder {
-        private Integer id;
-        private String username;
-        private String firstName;
-        private String lastName;
-        private String email;
-        private String password;
-        private String phone;
-        private Integer userStatus;
-
-        public UserBuilder id(Integer id) {
-            this.id = id;
-            return this;
-        }
-
-        public UserBuilder username(String username) {
-            this.username = username;
-            return this;
-        }
-
-        public UserBuilder firstName(String firstName) {
-            this.firstName = firstName;
-            return this;
-        }
-
-        public UserBuilder lastName(String lastName) {
-            this.lastName = lastName;
-            return this;
-        }
-
-        public UserBuilder email(String email) {
-            this.email = email;
-            return this;
-        }
-
-        public UserBuilder password(String password) {
-            this.password = password;
-            return this;
-        }
-
-        public UserBuilder phone(String phone) {
-            this.phone = phone;
-            return this;
-        }
-
-        public UserBuilder userStatus(Integer userStatus) {
-            this.userStatus = userStatus;
-            return this;
-        }
-
-        public User build() {
-            return new User(id, username, firstName, lastName, email, password, phone, userStatus);
-        }
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", phone='" + phone + '\'' +
+                ", userStatus=" + userStatus +
+                '}';
     }
 }
