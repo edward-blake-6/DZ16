@@ -28,4 +28,12 @@ public class ApiConfig {
         public static final String STAGING = "https://staging-petstore.swagger.io/v2";
         public static final String PROD = "https://petstore.swagger.io/v2";
     }
+
+    public static RequestSpecification getMultipartRequestSpec() {
+        return new RequestSpecBuilder()
+                .setBaseUri(BASE_URL)
+                .setContentType(ContentType.MULTIPART)
+                .setAccept(ContentType.JSON)
+                .build();
+    }
 }
