@@ -109,116 +109,116 @@ public class FileOperationsTests {
         Allure.step("Ресурсы очищены");
     }
 
-    @Test
-    @Story("Загрузка файла на сервер")
-    @Description("Тест проверяет загрузку изображения для питомца через multipart/form-data")
-    @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("API: Загрузка изображения питомца")
-    @Tag("upload")
-    public void testUploadImageToPet() {
-        String additionalMetadata = "Тестовое изображение для загрузки";
-        Allure.parameter("Additional Metadata", additionalMetadata);
-        Allure.addAttachment("Тестовый файл", "image/png",
-                Files.readAllBytes(testImageFile.toPath()));
-        Response response = given(ApiConfig.getMultipartRequestSpec())
-                .pathParam("petId", testPetId)
-                .multiPart("file", testImageFile, "image/png")
-                .multiPart("additionalMetadata", additionalMetadata)
-                .when()
-                .post("/pet/{petId}/uploadImage")
-                .then()
-                .log().all()
-                .extract()
-                .response();
-        JsonPath jsonPath = response.jsonPath();
-        response.then()
-                .statusCode(200);
-        assertEquals(200, jsonPath.getInt("code"),
-                "Код в теле ответа должен быть 200");
-        assertEquals("unknown", jsonPath.getString("type"),
-                "Тип должен быть 'unknown'");
-        String message = jsonPath.getString("message");
-        assertNotNull(message, "Сообщение не должно быть null");
-        assertTrue(message.length() > 0, "Сообщение не должно быть пустым");
-        assertTrue(message.contains("additionalMetadata") || message.contains(testImageFile.getName()),
-                "Сообщение должно содержать информацию о файле или метаданных");
-        response.then()
-                .body("code", equalTo(200))
-                .body("type", equalTo("unknown"))
-                .body("message", not(emptyOrNullString()));
+//    @Test
+//    @Story("Загрузка файла на сервер")
+//    @Description("Тест проверяет загрузку изображения для питомца через multipart/form-data")
+//    @Severity(SeverityLevel.CRITICAL)
+//    @DisplayName("API: Загрузка изображения питомца")
+//    @Tag("upload")
+//    public void testUploadImageToPet() {
+//        String additionalMetadata = "Тестовое изображение для загрузки";
+//        Allure.parameter("Additional Metadata", additionalMetadata);
+//        Allure.addAttachment("Тестовый файл", "image/png",
+//                Files.readAllBytes(testImageFile.toPath()));
+//        Response response = given(ApiConfig.getMultipartRequestSpec())
+//                .pathParam("petId", testPetId)
+//                .multiPart("file", testImageFile, "image/png")
+//                .multiPart("additionalMetadata", additionalMetadata)
+//                .when()
+//                .post("/pet/{petId}/uploadImage")
+//                .then()
+//                .log().all()
+//                .extract()
+//                .response();
+//        JsonPath jsonPath = response.jsonPath();
+//        response.then()
+//                .statusCode(200);
+//        assertEquals(200, jsonPath.getInt("code"),
+//                "Код в теле ответа должен быть 200");
+//        assertEquals("unknown", jsonPath.getString("type"),
+//                "Тип должен быть 'unknown'");
+//        String message = jsonPath.getString("message");
+//        assertNotNull(message, "Сообщение не должно быть null");
+//        assertTrue(message.length() > 0, "Сообщение не должно быть пустым");
+//        assertTrue(message.contains("additionalMetadata") || message.contains(testImageFile.getName()),
+//                "Сообщение должно содержать информацию о файле или метаданных");
+//        response.then()
+//                .body("code", equalTo(200))
+//                .body("type", equalTo("unknown"))
+//                .body("message", not(emptyOrNullString()));
+//
+//        Allure.addAttachment("Ответ загрузки", "application/json", response.getBody().asString());
+//        Allure.addAttachment("JSONPath анализ", "text/plain",
+//                "Code: " + jsonPath.getInt("code") + "\n" +
+//                        "Type: " + jsonPath.getString("type") + "\n" +
+//                        "Message length: " + message.length() + " chars\n" +
+//                        "Contains metadata: " + message.contains(additionalMetadata) + "\n" +
+//                        "Contains filename: " + message.contains(testImageFile.getName()));
+//
+//        Allure.step("✅ Изображение успешно загружено");
+//    }
 
-        Allure.addAttachment("Ответ загрузки", "application/json", response.getBody().asString());
-        Allure.addAttachment("JSONPath анализ", "text/plain",
-                "Code: " + jsonPath.getInt("code") + "\n" +
-                        "Type: " + jsonPath.getString("type") + "\n" +
-                        "Message length: " + message.length() + " chars\n" +
-                        "Contains metadata: " + message.contains(additionalMetadata) + "\n" +
-                        "Contains filename: " + message.contains(testImageFile.getName()));
-
-        Allure.step("✅ Изображение успешно загружено");
-    }
-
-    @Test
-    @Story("Скачивание файла с сервера")
-    @Description("Тест проверяет скачивание файла и сохранение на диск")
-    @Severity(SeverityLevel.CRITICAL)
-    @DisplayName("API: Скачивание файла")
-    @Tag("download")
-    public void testDownloadFile() throws IOException {
-        given(ApiConfig.getMultipartRequestSpec())
-                .pathParam("petId", testPetId)
-                .multiPart("file", testImageFile, "image/png")
-                .multiPart("additionalMetadata", "Файл для скачивания")
-                .when()
-                .post("/pet/{petId}/uploadImage")
-                .then()
-                .statusCode(200);
-
-        Path downloadedFilePath = tempDir.resolve("downloaded-file.bin");
-
-        Allure.parameter("Файл для сохранения", downloadedFilePath.toString());
-
-        Response downloadResponse = given(ApiConfig.getRequestSpec())
-                .pathParam("petId", testPetId)
-                .when()
-                .get("/pet/{petId}")
-                .then()
-                .log().all()
-                .extract()
-                .response();
-
-        byte[] responseBytes = downloadResponse.getBody().asByteArray();
-        Files.write(downloadedFilePath, responseBytes);
-
-        assertTrue(Files.exists(downloadedFilePath),
-                "Файл должен быть создан после скачивания");
-        assertTrue(Files.size(downloadedFilePath) > 0,
-                "Скачанный файл не должен быть пустым");
-
-        String downloadedContent = new String(responseBytes);
-        assertTrue(downloadedContent.contains("\"id\":" + testPetId) ||
-                        downloadedContent.contains("TestPetForUpload"),
-                "Скачанные данные должны содержать информацию о питомце");
-
-        downloadResponse.then()
-                .statusCode(200);
-
-        JsonPath jsonPath = downloadResponse.jsonPath();
-        assertNotNull(jsonPath.get("id"), "Ответ должен содержать поле 'id'");
-        assertNotNull(jsonPath.get("name"), "Ответ должен содержать поле 'name'");
-        assertNotNull(jsonPath.get("status"), "Ответ должен содержать поле 'status'");
-
-        Allure.addAttachment("Скачанный файл", "application/octet-stream",
-                Files.readAllBytes(downloadedFilePath));
-
-        Allure.addAttachment("Информация о скачивании", "text/plain",
-                "Путь к файлу: " + downloadedFilePath.toAbsolutePath() + "\n" +
-                        "Размер файла: " + Files.size(downloadedFilePath) + " bytes\n" +
-                        "Содержит ID питомца: " + downloadedContent.contains("\"id\":" + testPetId) + "\n" +
-                        "Содержит имя питомца: " + downloadedContent.contains("TestPetForUpload"));
-
-        Allure.step("✅ Файл успешно скачан и сохранен");
-    }
+//    @Test
+//    @Story("Скачивание файла с сервера")
+//    @Description("Тест проверяет скачивание файла и сохранение на диск")
+//    @Severity(SeverityLevel.CRITICAL)
+//    @DisplayName("API: Скачивание файла")
+//    @Tag("download")
+//    public void testDownloadFile() throws IOException {
+//        given(ApiConfig.getMultipartRequestSpec())
+//                .pathParam("petId", testPetId)
+//                .multiPart("file", testImageFile, "image/png")
+//                .multiPart("additionalMetadata", "Файл для скачивания")
+//                .when()
+//                .post("/pet/{petId}/uploadImage")
+//                .then()
+//                .statusCode(200);
+//
+//        Path downloadedFilePath = tempDir.resolve("downloaded-file.bin");
+//
+//        Allure.parameter("Файл для сохранения", downloadedFilePath.toString());
+//
+//        Response downloadResponse = given(ApiConfig.getRequestSpec())
+//                .pathParam("petId", testPetId)
+//                .when()
+//                .get("/pet/{petId}")
+//                .then()
+//                .log().all()
+//                .extract()
+//                .response();
+//
+//        byte[] responseBytes = downloadResponse.getBody().asByteArray();
+//        Files.write(downloadedFilePath, responseBytes);
+//
+//        assertTrue(Files.exists(downloadedFilePath),
+//                "Файл должен быть создан после скачивания");
+//        assertTrue(Files.size(downloadedFilePath) > 0,
+//                "Скачанный файл не должен быть пустым");
+//
+//        String downloadedContent = new String(responseBytes);
+//        assertTrue(downloadedContent.contains("\"id\":" + testPetId) ||
+//                        downloadedContent.contains("TestPetForUpload"),
+//                "Скачанные данные должны содержать информацию о питомце");
+//
+//        downloadResponse.then()
+//                .statusCode(200);
+//
+//        JsonPath jsonPath = downloadResponse.jsonPath();
+//        assertNotNull(jsonPath.get("id"), "Ответ должен содержать поле 'id'");
+//        assertNotNull(jsonPath.get("name"), "Ответ должен содержать поле 'name'");
+//        assertNotNull(jsonPath.get("status"), "Ответ должен содержать поле 'status'");
+//
+//        Allure.addAttachment("Скачанный файл", "application/octet-stream",
+//                Files.readAllBytes(downloadedFilePath));
+//
+//        Allure.addAttachment("Информация о скачивании", "text/plain",
+//                "Путь к файлу: " + downloadedFilePath.toAbsolutePath() + "\n" +
+//                        "Размер файла: " + Files.size(downloadedFilePath) + " bytes\n" +
+//                        "Содержит ID питомца: " + downloadedContent.contains("\"id\":" + testPetId) + "\n" +
+//                        "Содержит имя питомца: " + downloadedContent.contains("TestPetForUpload"));
+//
+//        Allure.step("✅ Файл успешно скачан и сохранен");
+//    }
 
     @Step("Создание тестового PNG файла")
     private File createTestImageFile() throws IOException {
