@@ -3,6 +3,8 @@ package com.example.tests;
 import com.example.driver.DriverFactory;
 import com.example.manager.PageManager;
 import com.example.pages.WebFormPage;
+import io.qameta.allure.Description;
+import io.qameta.allure.Story;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,8 @@ public class WebFormPageTest {
     }
 
     @Test
+    @Story("Ввод текста")
+    @Description("Проверка ввода текста в текстовое поле")
     public void testTextInput() {
         pageManager.openWebFormPage("https://bonigarcia.dev/selenium-webdriver-java/web-form.html");
 
