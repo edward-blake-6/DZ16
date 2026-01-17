@@ -218,7 +218,7 @@ public class FileOperationsTests {
 //                        "Содержит имя питомца: " + downloadedContent.contains("TestPetForUpload"));
 //
 //        Allure.step("✅ Файл успешно скачан и сохранен");
-//    }
+//    } //Проверим работу
 
     @Step("Создание тестового PNG файла")
     private File createTestImageFile() throws IOException {
